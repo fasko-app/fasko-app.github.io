@@ -84,13 +84,17 @@ function loadDownloadOptions() {
   }
 }
 
-let downloadBtn = document.getElementById('downloadBtn');
-let currentOptionId = getCurrentDownloadOptionId();
-if(downloadOptions[currentOptionId] != null && downloadOptions[currentOptionId].link != null) {
-  downloadBtn.innerHTML += ` for ${downloadOptions[currentOptionId].os}`;
-  downloadBtn.setAttribute('href', downloadOptions[currentOptionId].link);
-} else {
-  downloadBtn.setAttribute('href', '#otherOptions');
+function loadDownloadBtn() {
+  let downloadBtn = document.getElementById('downloadBtn');
+  let currentOptionId = getCurrentDownloadOptionId();
+  if(downloadOptions[currentOptionId] != null && downloadOptions[currentOptionId].link != null) {
+    downloadBtn.innerHTML += ` for ${downloadOptions[currentOptionId].os}`;
+    downloadBtn.setAttribute('href', downloadOptions[currentOptionId].link);
+  } else {
+    downloadBtn.setAttribute('href', '#otherOptions');
+  }
 }
 
+
+loadDownloadBtn();
 loadDownloadOptions();
