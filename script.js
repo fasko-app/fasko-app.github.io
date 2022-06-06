@@ -59,8 +59,6 @@ function getCurrentDownloadOptionId() {
   return null;
 }
 
-
-
 function loadDownloadOptions() {
   let downloadOptionsDiv = document.getElementById('downloadOptionsDiv');
   for (let i = 0; i < downloadOptions.length; i++) {
@@ -86,13 +84,13 @@ function loadDownloadOptions() {
   }
 }
 
+let downloadBtn = document.getElementById('downloadBtn');
 let currentOptionId = getCurrentDownloadOptionId();
 if(downloadOptions[currentOptionId] != null && downloadOptions[currentOptionId].link != null) {
-  downloadBtn.innerHTML += ` ${downloadOptions[currentOptionId].os}`;
+  downloadBtn.innerHTML += ` for ${downloadOptions[currentOptionId].os}`;
   downloadBtn.setAttribute('href', downloadOptions[currentOptionId].link);
 } else {
-  downloadBtn.innerHTML += ` ${downloadOptions[2].os}`;
-  downloadBtn.setAttribute('href', downloadOptions[2].link);
+  downloadBtn.setAttribute('href', '#otherOptions');
 }
 
 loadDownloadOptions();
