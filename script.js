@@ -77,14 +77,13 @@ function translatePage() {
   document
     .querySelectorAll("[data-i18n-key]")
     .forEach(translateElement);
+  loadDownloadBtn();
 }
-// Replace the inner text of the given HTML element
-// with the translation in the active locale,
-// corresponding to the element's data-i18n-key
+
 function translateElement(element) {
   const key = element.getAttribute("data-i18n-key");
   const translation = translations[key];
-  element.innerText = translation;
+  element.innerHTML = translation;
 }
 
 function getCurrentDownloadOptionId() {
@@ -143,7 +142,7 @@ function loadDownloadBtn() {
   let downloadBtn = document.getElementById('downloadBtn');
   let currentOptionId = getCurrentDownloadOptionId();
   if(downloadOptions[currentOptionId] != null && downloadOptions[currentOptionId].link != null) {
-    downloadBtn.innerHTML += ` for ${downloadOptions[currentOptionId].os}`;
+    downloadBtn.innerText += ` ${translations['for']} ${downloadOptions[currentOptionId].os}`;
     downloadBtn.setAttribute('href', downloadOptions[currentOptionId].link);
   } else {
     downloadBtn.setAttribute('href', '#otherOptions');
@@ -158,8 +157,7 @@ function bindLocaleSwitcher(initialValue) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  const initialLocale = 
-    supportedOrDefault(browserLocales(true));
+  const initialLocale = supportedOrDefault(browserLocales(true));
 
   setLocale(initialLocale);
   bindLocaleSwitcher(initialLocale);
