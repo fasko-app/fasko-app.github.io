@@ -3,5 +3,6 @@
   "under-header": "Start timer for task on your desktop app and keep the timer going on mobile",
   "download": "Download",
   "options":"Other options",
-  "for":"for"
+  "for":"for",
+  "logo":"assets/logo.png"
 }

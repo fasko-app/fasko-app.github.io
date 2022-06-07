@@ -78,6 +78,7 @@ function translatePage() {
     .querySelectorAll("[data-i18n-key]")
     .forEach(translateElement);
   loadDownloadBtn();
+  loadLogoImage();
 }
 
 function translateElement(element) {
@@ -147,6 +148,11 @@ function loadDownloadBtn() {
   } else {
     downloadBtn.setAttribute('href', '#otherOptions');
   }
+}
+
+function loadLogoImage() {
+  let logoImg = document.getElementById('logoImg');
+  logoImg.setAttribute("src", translations['logo']);
 }
 
 
