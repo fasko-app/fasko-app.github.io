@@ -3,34 +3,89 @@ let downloadOptions = [
   {
     os:'Windows',
     link: null,
-    img: 'assets/windows-logo.png',
+    img: 'assets/logos/windows-logo.png',
     current: false
   },
   {
     os:'Mac OS',
     link: null,
-    img: 'assets/macos-logo.png',
+    img: 'assets/logos/macos-logo.png',
     current: false
   },
   {
     os:'iOS',
     link: null,
-    img: 'assets/ios-logo.png',
+    img: 'assets/logos/ios-logo.png',
     current: false
   },
   {
     os:'Android',
     link: 'https://github.com/fasko-app/fasko_mobile_public/releases/latest/download/fasko.apk',
-    img: 'assets/android-logo.png',
+    img: 'assets/logos/android-logo.png',
     current: false
   },
   {
     os:'Linux',
     link: null,
-    img: 'assets/linux-logo.png',
+    img: 'assets/logos/linux-logo.png',
     current: false
   },
 ];
+
+const defaultLocale = "en";
+const supportedLocales = ["en", "uk"];
+// The active locale
+let locale;
+// Gets filled with active locale translations
+let translations = {};
+
+
+function browserLocales(languageCodeOnly = true) {
+  return navigator.languages.map((locale) =>
+    languageCodeOnly ? locale.split("-")[0] : locale,
+  );
+}
+
+
+function isSupported(locale) {
+  return supportedLocales.indexOf(locale) > -1;
+}
+// Retrieve the first locale we support from the given
+// array, or return our default locale
+function supportedOrDefault(locales) {
+  return locales.find(isSupported) || defaultLocale;
+}
+
+async function setLocale(newLocale) {
+  if (newLocale === locale) return;
+  const newTranslations = 
+    await fetchTranslationsFor(newLocale);
+  locale = newLocale;
+  translations = newTranslations;
+  translatePage();
+}
+// Retrieve translations JSON object for the given
+// locale over the network
+async function fetchTranslationsFor(newLocale) {
+  const response = await fetch(`langs/${newLocale}.json`);
+  return await response.json();
+}
+// Replace the inner text of each element that has a
+// data-i18n-key attribute with the translation corresponding
+// to its data-i18n-key
+function translatePage() {
+  document
+    .querySelectorAll("[data-i18n-key]")
+    .forEach(translateElement);
+}
+// Replace the inner text of the given HTML element
+// with the translation in the active locale,
+// corresponding to the element's data-i18n-key
+function translateElement(element) {
+  const key = element.getAttribute("data-i18n-key");
+  const translation = translations[key];
+  element.innerText = translation;
+}
 
 function getCurrentDownloadOptionId() {
   var userAgent = window.navigator.userAgent,
@@ -96,5 +151,20 @@ function loadDownloadBtn() {
 }
 
 
-loadDownloadBtn();
-loadDownloadOptions();
+function bindLocaleSwitcher(initialValue) {
+  const switcher = document.querySelector("[data-i18n-switcher]");
+  switcher.value = initialValue;
+  switcher.onchange = e => setLocale(e.target.value);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const initialLocale = 
+    supportedOrDefault(browserLocales(true));
+
+  setLocale(initialLocale);
+  bindLocaleSwitcher(initialLocale);
+
+  loadDownloadBtn();
+  loadDownloadOptions();
+});
+
