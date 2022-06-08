@@ -34,57 +34,65 @@ let downloadOptions = [
 
 const defaultLocale = "en";
 const supportedLocales = ["en", "uk"];
-// The active locale
+
 let locale;
-// Gets filled with active locale translations
 let translations = {};
 
 
-function browserLocales(languageCodeOnly = true) {
-  return navigator.languages.map((locale) =>
-    languageCodeOnly ? locale.split("-")[0] : locale,
-  );
+
+document.addEventListener('DOMContentLoaded', () => {
+  const initialLocale = supportedOrDefault(browserLocales());
+
+  setLocale(initialLocale);
+  bindLocaleSwitcher(initialLocale);
+
+  buildDownloadOptions();
+});
+
+
+function buildPage() {
+  translatePage();
+  buildDownloadBtn();
+  buildLogoImage();
 }
 
+
+// get user supported locales
+function browserLocales() {
+  return navigator.languages.map((locale) => locale.split("-")[0]);
+}
 
 function isSupported(locale) {
   return supportedLocales.indexOf(locale) > -1;
 }
-// Retrieve the first locale we support from the given
-// array, or return our default locale
+
 function supportedOrDefault(locales) {
   return locales.find(isSupported) || defaultLocale;
 }
 
 async function setLocale(newLocale) {
   if (newLocale === locale) return;
-  const newTranslations = 
-    await fetchTranslationsFor(newLocale);
+
+  translations = await fetchTranslationsFor(newLocale);
   locale = newLocale;
-  translations = newTranslations;
-  translatePage();
+
+  buildPage();
 }
-// Retrieve translations JSON object for the given
-// locale over the network
+
 async function fetchTranslationsFor(newLocale) {
   const response = await fetch(`langs/${newLocale}.json`);
   return await response.json();
 }
-// Replace the inner text of each element that has a
-// data-i18n-key attribute with the translation corresponding
-// to its data-i18n-key
+
 function translatePage() {
   document
     .querySelectorAll("[data-i18n-key]")
     .forEach(translateElement);
-  loadDownloadBtn();
-  loadLogoImage();
 }
 
 function translateElement(element) {
   const key = element.getAttribute("data-i18n-key");
-  const translation = translations[key];
-  element.innerHTML = translation;
+  element.innerText = translations[key];
 }
 
 function getCurrentDownloadOptionId() {
@@ -114,7 +122,7 @@ function getCurrentDownloadOptionId() {
   return null;
 }
 
-function loadDownloadOptions() {
+function buildDownloadOptions() {
   let downloadOptionsDiv = document.getElementById('downloadOptionsDiv');
   for (let i = 0; i < downloadOptions.length; i++) {
     const element = downloadOptions[i];
@@ -130,7 +138,7 @@ function loadDownloadOptions() {
             <img src="${element.img}" class="card-img-top w-25" alt="${element.os}">
           </div>
           <div class="card-footer bg-transparent border-dark p-0">
-            <a class="btn btn-light w-100 h-100" href="${element.link}">Download</a>
+            <a class="btn btn-light w-100 h-100" href="${element.link}" data-i18n-key="download"></a>
           </div>
         </div>
       </div>
@@ -139,36 +147,26 @@ function loadDownloadOptions() {
   }
 }
 
-function loadDownloadBtn() {
+function buildDownloadBtn() {
   let downloadBtn = document.getElementById('downloadBtn');
   let currentOptionId = getCurrentDownloadOptionId();
   if(downloadOptions[currentOptionId] != null && downloadOptions[currentOptionId].link != null) {
-    downloadBtn.innerText += ` ${translations['for']} ${downloadOptions[currentOptionId].os}`;
+    downloadBtn.innerHTML = `<i class="bi bi-download"></i>&nbsp ${translations['download']} ${translations['for']} ${downloadOptions[currentOptionId].os}`;
     downloadBtn.setAttribute('href', downloadOptions[currentOptionId].link);
   } else {
+    downloadBtn.innerHTML = `<i class="bi bi-download"></i>&nbsp ${translations['download']}`;
     downloadBtn.setAttribute('href', '#otherOptions');
   }
 }
 
-function loadLogoImage() {
-  let logoImg = document.getElementById('logoImg');
+function buildLogoImage() {
+  const logoImg = document.getElementById('logoImg');
   logoImg.setAttribute("src", translations['logo']);
 }
 
 
-function bindLocaleSwitcher(initialValue) {
+function bindLocaleSwitcher(value) {
   const switcher = document.querySelector("[data-i18n-switcher]");
-  switcher.value = initialValue;
+  switcher.value = value;
   switcher.onchange = e => setLocale(e.target.value);
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-  const initialLocale = supportedOrDefault(browserLocales(true));
-
-  setLocale(initialLocale);
-  bindLocaleSwitcher(initialLocale);
-
-  loadDownloadBtn();
-  loadDownloadOptions();
-});
-
