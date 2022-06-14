@@ -26,7 +26,7 @@ const downloadOptions = [
   },
   {
     os:'Android',
-    link: 'https://github.com/fasko-app/fasko_mobile_public/releases/latest/download/fasko.apk',
+    link: 'https://github.com/fasko-app/fasko/releases/latest/download/fasko.apk',
     img: 'assets/logos/android-logo.png',
     current: false
   },
