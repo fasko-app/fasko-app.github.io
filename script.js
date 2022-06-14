@@ -1,5 +1,11 @@
 // downloadOptions are index fixed. Don't move them!
-let downloadOptions = [
+const downloadOptions = [
+  {
+    os:'Web',
+    link: 'https://fasko-app.web.app',
+    img: 'assets/logos/web-logo.png',
+    current: false
+  },
   {
     os:'Windows',
     link: null,
@@ -38,6 +44,7 @@ const supportedLocales = ["en", "uk"];
 let locale;
 let translations = {};
 
+let currentOptionId = getCurrentDownloadOptionId();
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -45,7 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   setLocale(initialLocale);
   bindLocaleSwitcher(initialLocale);
-
   buildDownloadOptions();
 });
 
@@ -104,15 +110,19 @@ function getCurrentDownloadOptionId() {
 
   let optionIndex = -1;
   if (macosPlatforms.indexOf(platform) !== -1) {
-    optionIndex = 1;
+    optionIndex = 0;
+    //optionIndex = 1;
   } else if (iosPlatforms.indexOf(platform) !== -1) {
-    optionIndex = 2;
+    optionIndex = 0;
+    //optionIndex = 2;
   } else if (windowsPlatforms.indexOf(platform) !== -1) {
     optionIndex = 0;
+    //optionIndex = 1;
   } else if (/Android/.test(userAgent)) {
-    optionIndex = 3;
-  } else if (!os && /Linux/.test(platform)) {
     optionIndex = 4;
+  } else if (!os && /Linux/.test(platform)) {
+    optionIndex = 0;
+    //optionIndex = 4;
   }
 
   if(optionIndex != -1) {
@@ -126,7 +136,7 @@ function buildDownloadOptions() {
   let downloadOptionsDiv = document.getElementById('downloadOptionsDiv');
   for (let i = 0; i < downloadOptions.length; i++) {
     const element = downloadOptions[i];
-    if(element.link != null && element.current == false) {
+    if(!element.current && element.link != null) {
       downloadOptionsDiv.innerHTML += 
       `
       <div class="col-sm-6">
@@ -138,7 +148,7 @@ function buildDownloadOptions() {
             <img src="${element.img}" class="card-img-top w-25" alt="${element.os}">
           </div>
           <div class="card-footer bg-transparent border-dark p-0">
-            <a class="btn btn-light w-100 h-100" href="${element.link}" data-i18n-key="download"></a>
+            <a class="btn btn-light w-100 h-100" href="${element.link}" data-i18n-key="${element.os == 'Web' ? 'visit' : 'download'}"></a>
           </div>
         </div>
       </div>
@@ -149,9 +159,8 @@ function buildDownloadOptions() {
 
 function buildDownloadBtn() {
   let downloadBtn = document.getElementById('downloadBtn');
-  let currentOptionId = getCurrentDownloadOptionId();
   if(downloadOptions[currentOptionId] != null && downloadOptions[currentOptionId].link != null) {
-    downloadBtn.innerHTML = `<i class="bi bi-download"></i>&nbsp ${translations['download']} ${translations['for']} ${downloadOptions[currentOptionId].os}`;
+    downloadBtn.innerHTML = `<i class="bi bi-download"></i>&nbsp ${translations[currentOptionId == 0 ? 'visit' : 'download']} ${translations['for']} ${downloadOptions[currentOptionId].os}`;
     downloadBtn.setAttribute('href', downloadOptions[currentOptionId].link);
   } else {
     downloadBtn.innerHTML = `<i class="bi bi-download"></i>&nbsp ${translations['download']}`;
